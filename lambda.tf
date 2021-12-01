@@ -4,6 +4,7 @@
 #
 module "start_export_task_lambda" {
   source = "github.com/terraform-aws-modules/terraform-aws-lambda?ref=v2.23.0"
+  create = var.enabled
 
   function_name = "${local.prefix}rds-export-to-s3${local.postfix}"
   description   = "RDS Export To S3"
@@ -21,7 +22,7 @@ module "start_export_task_lambda" {
     SNAPSHOT_BUCKET_NAME : var.snapshots_bucket_name,
     SNAPSHOT_BUCKET_PREFIX : var.snapshots_bucket_prefix,
     SNAPSHOT_TASK_ROLE : aws_iam_role.rdsSnapshotExportTask.arn,
-    SNAPSHOT_TASK_KEY : var.create_customer_kms_key ? aws_kms_key.snapshotExportEncryptionKey[0].arn : var.customer_kms_key_arn
+    SNAPSHOT_TASK_KEY : local.kms_key_arn
     LOG_LEVEL : var.log_level,
   }
 
@@ -36,6 +37,7 @@ module "start_export_task_lambda" {
 #
 module "monitor_export_task_lambda" {
   source = "github.com/terraform-aws-modules/terraform-aws-lambda?ref=v2.23.0"
+  create = var.enabled
 
   function_name = "${local.prefix}rds-export-to-s3-monitor${local.postfix}"
   description   = "RDS Export To S3 Monitor"
@@ -49,7 +51,7 @@ module "monitor_export_task_lambda" {
 
   environment_variables = {
     DB_NAME : var.database_names,
-    SNS_NOTIFICATIONS_TOPIC_ARN : var.create_notifications_topic ? aws_sns_topic.exportMonitorNotifications[0].arn : var.notifications_topic_arn,
+    SNS_NOTIFICATIONS_TOPIC_ARN : var.notifications_topic_arn
     LOG_LEVEL : var.log_level,
   }
 

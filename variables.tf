@@ -1,8 +1,17 @@
 #regex snapshots bucket name
 locals {
-  snapshots_bucket_arn = "arn:aws:s3:::${var.snapshots_bucket_name}"
-  prefix               = var.prefix != null ? "${var.prefix}-" : ""
-  postfix              = var.postfix != null ? "-${var.postfix}" : "-${data.aws_region.current.name}"
+  snapshots_events_topic_arn = var.create_snapshots_events_topic ? aws_sns_topic.rdsSnapshotsEvents[0].arn : var.snapshots_events_topic_arn
+  notifications_topic_arn    = var.create_notifications_topic ? aws_sns_topic.exportMonitorNotifications[0].arn : var.notifications_topic_arn
+  kms_key_arn                = var.create_customer_kms_key ? aws_kms_key.snapshotExportEncryptionKey[0].arn : var.customer_kms_key_arn
+  snapshots_bucket_arn       = "arn:aws:s3:::${var.snapshots_bucket_name}"
+  prefix                     = var.prefix != null ? "${var.prefix}-" : ""
+  postfix                    = var.postfix != null ? "-${var.postfix}" : "-${data.aws_region.current.name}"
+}
+
+variable "enabled" {
+  description = "Enable/disable module. It will not disable 'create_customer_kms_key', since it will affect exports if KMS key get removed"
+  type        = bool
+  default     = true
 }
 
 variable "prefix" {
@@ -31,6 +40,18 @@ variable "snapshots_bucket_name" {
 
 variable "snapshots_bucket_prefix" {
   description = "The Amazon S3 bucket prefix to use as the file name and path of the exported snapshot. For example, use the prefix exports/2019/"
+  type        = string
+  default     = null
+}
+
+variable "create_snapshots_events_topic" {
+  description = "Create new SNS notifications topic which will be used for publishing snapshots events messages. Used to trigger RDS export Lambda function."
+  type        = bool
+  default     = true
+}
+
+variable "snapshots_events_topic_arn" {
+  description = "The ARN of an SNS Topic which will be used for publishing snapshots events messages. Required if 'create_snapshots_events_topic' is set to 'false'."
   type        = string
   default     = null
 }
