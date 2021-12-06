@@ -21,7 +21,7 @@ module "start_export_task_lambda" {
     DB_NAME : var.database_names,
     SNAPSHOT_BUCKET_NAME : var.snapshots_bucket_name,
     SNAPSHOT_BUCKET_PREFIX : var.snapshots_bucket_prefix,
-    SNAPSHOT_TASK_ROLE : aws_iam_role.rdsSnapshotExportTask.arn,
+    SNAPSHOT_TASK_ROLE : aws_iam_role.rdsSnapshotExportTask[0].arn,
     SNAPSHOT_TASK_KEY : local.kms_key_arn
     LOG_LEVEL : var.log_level,
   }
@@ -51,12 +51,12 @@ module "monitor_export_task_lambda" {
 
   environment_variables = {
     DB_NAME : var.database_names,
-    SNS_NOTIFICATIONS_TOPIC_ARN : var.notifications_topic_arn
+    SNS_NOTIFICATIONS_TOPIC_ARN : local.notifications_topic_arn
     LOG_LEVEL : var.log_level,
   }
 
   attach_policy = true
-  policy        = aws_iam_policy.rdsMonitorExportTaskLambda.arn
+  policy        = aws_iam_policy.rdsMonitorExportTaskLambda[0].arn
 
   tags = merge({ Name = "${local.prefix}rds-export-to-s3-monitor${local.postfix}" }, var.tags)
 }

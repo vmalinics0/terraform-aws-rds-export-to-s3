@@ -2,6 +2,7 @@
 # Create an event rule to listen for RDS DB Cluster Snapshot Events
 #
 resource "aws_cloudwatch_event_rule" "rdsSnapshotCreation" {
+  count       = var.enabled ? 1 : 0
   name        = "${local.prefix}rds-snapshot-creation${local.postfix}"
   description = "RDS Snapshot Creation"
 
@@ -23,7 +24,8 @@ PATTERN
 # Send the events captured by the rule above to an SNS Topic
 #
 resource "aws_cloudwatch_event_target" "rdsSnapshotCreationTopic" {
-  rule      = aws_cloudwatch_event_rule.rdsSnapshotCreation.name
+  count     = var.enabled ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.rdsSnapshotCreation[0].name
   target_id = "SendToSNS"
-  arn       = aws_sns_topic.rdsSnapshotsEvents.arn
+  arn       = local.snapshots_events_topic_arn
 }

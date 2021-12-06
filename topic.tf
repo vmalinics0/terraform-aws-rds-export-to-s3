@@ -63,7 +63,7 @@ resource "aws_lambda_permission" "snsCanTriggerStartExportTask" {
   action        = "lambda:InvokeFunction"
   function_name = module.start_export_task_lambda.lambda_function_name
   principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.rdsSnapshotsEvents.arn
+  source_arn    = local.snapshots_events_topic_arn
 }
 
 resource "aws_lambda_permission" "snsCanTriggerMonitorExportTask" {
@@ -72,5 +72,5 @@ resource "aws_lambda_permission" "snsCanTriggerMonitorExportTask" {
   action        = "lambda:InvokeFunction"
   function_name = module.monitor_export_task_lambda.lambda_function_name
   principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.rdsSnapshotsEvents.arn
+  source_arn    = local.snapshots_events_topic_arn
 }
