@@ -83,7 +83,7 @@ resource "aws_iam_policy" "rdsStartExportTaskLambda" {
                 "kms:DescribeKey"
             ],
             "Resource" : [
-                local.kms_key_arn
+                "${local.kms_key_arn}"
             ]
         },
         {
@@ -93,7 +93,7 @@ resource "aws_iam_policy" "rdsStartExportTaskLambda" {
                 "kms:ListGrants",
                 "kms:RevokeGrant"
             ],
-            "Resource": local.kms_key_arn,
+            "Resource": "${local.kms_key_arn}",
             "Condition": {
                 "Bool": { "kms:GrantIsForAWSResource": "true" }
             }
