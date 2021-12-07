@@ -116,7 +116,7 @@ resource "aws_iam_policy" "rdsMonitorExportTaskLambda" {
     "Statement": [
         {
             "Action": "sns:Publish",
-            "Resource": [ local.notifications_topic_arn ],
+            "Resource": [ "${local.notifications_topic_arn}" ],
             "Effect": "Allow"
         }
     ]

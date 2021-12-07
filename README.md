@@ -21,6 +21,8 @@ A single CloudWatch Event Rule takes care of listening for RDS Snapshots Events 
 * The module requires you to provide the S3 bucket that will be used for storing the exported snapshots. The good thing about this is that you are able to configure the bucket in any way you need. E.g. replication, lifecycle, locking, and so on.
 * The module can create an export monitor SNS notification topic, also existing SNS topics are supported via `notifications_topic_arn` variable.
 * Multi-region support via terraform providers.
+* Shared SNS and KMS are supported 
+* Conditional module enable/disable switch added
 
 ## Requirements
 
@@ -38,8 +40,8 @@ A single CloudWatch Event Rule takes care of listening for RDS Snapshots Events 
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_monitor_export_task_lambda"></a> [monitor\_export\_task\_lambda](#module\_monitor\_export\_task\_lambda) | github.com/terraform-aws-modules/terraform-aws-lambda | v2.23.0 |
-| <a name="module_start_export_task_lambda"></a> [start\_export\_task\_lambda](#module\_start\_export\_task\_lambda) | github.com/terraform-aws-modules/terraform-aws-lambda | v2.23.0 |
+| <a name="module_monitor_export_task_lambda"></a> [monitor\_export\_task\_lambda](#module\_monitor\_export\_task\_lambda) | github.com/terraform-aws-modules/terraform-aws-lambda | v2.27.0 |
+| <a name="module_start_export_task_lambda"></a> [start\_export\_task\_lambda](#module\_start\_export\_task\_lambda) | github.com/terraform-aws-modules/terraform-aws-lambda | v2.27.0 |
 
 ## Resources
 
@@ -68,13 +70,16 @@ A single CloudWatch Event Rule takes care of listening for RDS Snapshots Events 
 |------|-------------|------|---------|:--------:|
 | <a name="input_create_customer_kms_key"></a> [create\_customer\_kms\_key](#input\_create\_customer\_kms\_key) | Create customer managed KMS key which is used for encrypting the exported snapshots on S3. If set to `false`, then `customer_kms_key_arn` is used. | `bool` | `false` | no |
 | <a name="input_create_notifications_topic"></a> [create\_notifications\_topic](#input\_create\_notifications\_topic) | Create new SNS notifications topic which will be used for publishing notifications messages. | `bool` | `true` | no |
+| <a name="input_create_snapshots_events_topic"></a> [create\_snapshots\_events\_topic](#input\_create\_snapshots\_events\_topic) | Create new SNS notifications topic which will be used for publishing snapshots events messages. Used to trigger RDS export Lambda function. | `bool` | `true` | no |
 | <a name="input_customer_kms_key_arn"></a> [customer\_kms\_key\_arn](#input\_customer\_kms\_key\_arn) | The ARN of customer managed key used for RDS export encryption. Mandatory if `create_customer_kms_key` is set to `false`. Ex: `"arn:aws:kms:<region>:<accountID>:key/<key-id>"` | `string` | `null` | no |
 | <a name="input_database_names"></a> [database\_names](#input\_database\_names) | The names of the databases whose snapshots we want to export to S3. Comma-separated values), ex: `"db-cluster1, db-cluster2"` | `string` | `null` | yes |
+| <a name="input_enabled"></a> [enabled](#input\_enabled) | Enable/disable module. Please note, it will not disable/remove KMS Key is module is disabled since it will affect exports if KMS key get removed. For KMS use `create_customer_kms_key`. | `bool` | `true` | no |
 | <a name="input_log_level"></a> [log\_level](#input\_log\_level) | The log level of the Lambda function. | `string` | `"INFO"` | no |
 | <a name="input_notifications_topic_arn"></a> [notifications\_topic\_arn](#input\_notifications\_topic\_arn) | The ARN of an SNS Topic which will be used for publishing notifications messages. Required if `create_notifications_topic` is set to `false`. | `string` | `null` | no |
 | <a name="input_postfix"></a> [postfix](#input\_postfix) | Postfix that will be used for naming resources. `resouce-name-<postfix>`.| `string` | `<region>` | no |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix that will be used for naming resources. `<prefix>-resouce-name`. | `string` | `null` | no |
 | <a name="input_rds_event_ids"></a> [rds\_event\_id](#input\_rds\_event\_ids) | RDS (CloudWatch) Event IDs that will trigger the calling of RDS Start Export Task API:<br>- Automated snapshots of Aurora RDS: RDS-EVENT-0169<br>- Automated snapshots of non-Aurora RDS: RDS-EVENT-0091<br>Only automated backups of either RDS Aurora and RDS non-Aurora are supported.<br>Ref: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Events.Messages.html#USER_Events.Messages.snapshot<br>Ref: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_Events.Messages.html#USER_Events.Messages.cluster-snapshot. | `string` | `"RDS-EVENT-0091, RDS-EVENT-0169"` | no |
+| <a name="input_snapshots_events_topic_arn"></a> [snapshots\_events\_topic\_arn](#input\_snapshots\_events\_topic\_arn) | The ARN of an SNS Topic which will be used for publishing snapshots events messages. Required if `create_snapshots_events_topic` is set to `false`. | `string` | `null` | no |
 | <a name="input_snapshots_bucket_name"></a> [snapshots\_bucket\_name](#input\_snapshots\_bucket\_name) | The name of the bucket where the RDS snapshots will be exported to. | `string` | `null` | yes |
 | <a name="input_snapshots_bucket_prefix"></a> [snapshots\_bucket\_prefix](#input\_snapshots\_bucket\_prefix) | The Amazon S3 bucket prefix to use as the file name and path of the exported snapshot. For example, use the prefix `"exports/2019/"`. | `string` | `null` | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A mapping of tags to assign to the bucket. | `map(string)` | `{}` | no |

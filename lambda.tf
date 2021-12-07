@@ -3,7 +3,7 @@
 # database name and the event id for which this is configured.
 #
 module "start_export_task_lambda" {
-  source = "github.com/terraform-aws-modules/terraform-aws-lambda?ref=v2.23.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-lambda?ref=v2.27.0"
   create = var.enabled
 
   function_name = "${local.prefix}rds-export-to-s3${local.postfix}"
@@ -27,7 +27,7 @@ module "start_export_task_lambda" {
   }
 
   attach_policy = true
-  policy        = aws_iam_policy.rdsStartExportTaskLambda.arn
+  policy        = aws_iam_policy.rdsStartExportTaskLambda[0].arn
 
   tags = merge({ Name = "${local.prefix}rds-export-to-s3${local.postfix}" }, var.tags)
 }
@@ -36,7 +36,7 @@ module "start_export_task_lambda" {
 # This function will react to rds snapshot export task events.
 #
 module "monitor_export_task_lambda" {
-  source = "github.com/terraform-aws-modules/terraform-aws-lambda?ref=v2.23.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-lambda?ref=v2.27.0"
   create = var.enabled
 
   function_name = "${local.prefix}rds-export-to-s3-monitor${local.postfix}"
