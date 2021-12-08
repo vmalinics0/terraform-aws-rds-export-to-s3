@@ -79,7 +79,7 @@ resource "aws_kms_key" "snapshotExportEncryptionKey" {
   count       = var.create_customer_kms_key ? 1 : 0
   description = "Snapshot Export Encryption Key"
   tags        = merge({ Name = "${local.prefix}kms-rds-snapshot-key${local.postfix}" }, var.tags)
-  policy      = var.enabled ? data.aws_iam_policy_document.snapshotExportEncryptionKeyPolicy.json : null
+  policy      = var.enabled ? data.aws_iam_policy_document.snapshotExportEncryptionKeyPolicy[0].json : null
 }
 
 #
