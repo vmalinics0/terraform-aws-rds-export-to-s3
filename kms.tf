@@ -2,7 +2,8 @@
 # KMS Policy 
 #
 data "aws_iam_policy_document" "snapshotExportEncryptionKeyPolicy" {
-  count = var.create_customer_kms_key ? 1 : 0
+  count      = var.enabled && var.create_customer_kms_key ? 1 : 0
+  depends_on = [module.start_export_task_lambda]
 
   statement {
     sid = "Allow administration of the key to the account"
