@@ -9,7 +9,7 @@ locals {
 }
 
 variable "enabled" {
-  description = "Enable/disable module. Please note, it will not disable/remove KMS Key is module is disabled, since it will affect exports if KMS key get removed. For KMS use 'create_customer_kms_key'."
+  description = "Enable/disable module. Please note, if 'create_customer_kms_key' is true, then it will also disable/remove KMS Key if module is disabled."
   type        = bool
   default     = true
 }
