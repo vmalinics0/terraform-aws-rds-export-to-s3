@@ -6,11 +6,12 @@ module "start_export_task_lambda" {
   source = "github.com/terraform-aws-modules/terraform-aws-lambda?ref=v2.23.0"
   create = var.enabled
 
-  function_name = "${local.prefix}rds-export-to-s3${local.postfix}"
-  description   = "RDS Export To S3"
-  handler       = "index.handler"
-  runtime       = "python3.8"
-  #publish       = true
+  function_name            = "${local.prefix}rds-export-to-s3${local.postfix}"
+  description              = "RDS Export To S3"
+  handler                  = "index.handler"
+  runtime                  = "python3.8"
+  publish                  = true
+  recreate_missing_package = false
 
   cloudwatch_logs_retention_in_days = 90
 
