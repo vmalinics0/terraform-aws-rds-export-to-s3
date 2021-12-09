@@ -10,7 +10,7 @@ module "start_export_task_lambda" {
   description   = "RDS Export To S3"
   handler       = "index.handler"
   runtime       = "python3.8"
-  publish       = true
+  #publish       = true
 
   cloudwatch_logs_retention_in_days = 90
 
